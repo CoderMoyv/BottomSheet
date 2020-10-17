@@ -136,40 +136,28 @@
         })
 
         var BottomSheet = $("#myBottomSheet")
-        var OperationBar = $("#")
+        var OperationBar = $("#myBottomSheet .operationBar")
         var winHeigth = $(window).height()
         var touchStartSize = ""
         var BottomSheetStartTop = BottomSheet.offset().top
         var touchStartTime = ""
-        BottomSheet.on('touchstart', function (even) {
+        OperationBar.on('touchstart', function (even) {
             //console.log("滑动开始")
-            if (!isScollTop) {
-                return
-            }
+
             touchStartTime = new Date().getTime()
             var touchSize = even.originalEvent.changedTouches[0].pageY
             BottomSheetStartTop = BottomSheet.offset().top
             touchStartSize = touchSize
         })
-        BottomSheet.on('touchmove', function (even) {
+        OperationBar.on('touchmove', function (even) {
             //console.log("滑动进行")
 
             var touchSize = even.originalEvent.changedTouches[0].pageY
             var BottomSheetMoveSize = 0
             var DTouchSize = touchStartSize - touchSize
             //console.log(DTouchSize)
+            event.preventDefault();
 
-            if (DTouchSize >= 0) {
-                if (BottomSheetStartTop != 0) {
-                    event.preventDefault();
-                }
-
-            } else {
-                if (!isScollTop) {
-                    event.preventDefault();
-                    return
-                }
-            }
             BottomSheetMoveSize = BottomSheetStartTop - DTouchSize
             if (BottomSheetMoveSize <= 0) {
                 BottomSheetMoveSize = 0
@@ -179,17 +167,29 @@
             BottomSheetMoveSize = 0 - BottomSheetMoveSize
             BottomSheet.css({ "bottom": BottomSheetMoveSize + "px" })
         })
-        BottomSheet.on('touchend', function (even) {
+        OperationBar.on('touchend', function (even) {
             //console.log("滑动结束")
+            var touchEndTime = new Date().getTime()
             var touchSize = even.originalEvent.changedTouches[0].pageY
             var BottomSheetMoveSize = 0
-            if (touchStartSize > touchSize) {
-                //上滑
-                BottomSheetMoveSize = 0
+            if (touchEndTime - touchStartTime > 1000) {
+                var top = BottomSheet.offset().top
+                var higth = BottomSheet.innerHeight()
+                if (top < higth / 2) {
+                    BottomSheetMoveSize = 0
+                }else{
+                    BottomSheetMoveSize = -500
+                }
             } else {
-                //下滑
-                BottomSheetMoveSize = -500
+                if (touchStartSize > touchSize) {
+                    //上滑
+                    BottomSheetMoveSize = 0
+                } else {
+                    //下滑
+                    BottomSheetMoveSize = -500
+                }
             }
+
             BottomSheet.animate({ "bottom": BottomSheetMoveSize + "px" }, 200);
         })
     </script>
