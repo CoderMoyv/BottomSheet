@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0,viewport-fit=cover">
+    <title>BottomSheet</title>
+    <style>
+        html,
+        body,
+        header,
+        section,
+        footer,
+        div,
+        ul,
+        ol,
+        li,
+        img,
+        a,
+        span,
+        em,
+        del,
+        legend,
+        center,
+        strong,
+        var,
+        fieldset,
+        form,
+        label,
+        dl,
+        dt,
+        dd,
+        cite,
+        input,
+        hr,
+        time,
+        mark,
+        code,
+        figcaption,
+        figure,
+        textarea,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p {
+            margin: 0;
+            border: 0;
+            padding: 0;
+            font-style: normal;
+        }
+
+        body {
+            background-color: #f6f7fa;
+        }
+
+        .BottomSheet {
+            position: fixed;
+            width: 100vw;
+            left: 0;
+            background-color: #fff;
+            height: 100vh;
+            /* transition: bottom 0.3s; */
+        }
+
+        .BottomSheet .operationBar {
+            height: 20px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .BottomSheet .operationBar .icon-operationBar {
+            width: 30px;
+            height: 5px;
+            background-color: #999;
+            border-radius: 10px;
+        }
+
+        .BottomSheet .BottomSheet-Body {
+            height: calc(100vh - 20px);
+            overflow-y: auto;
+        }
+
+        .list {
+            height: 100%;
+        }
+
+        .list .item {
+            height: 100px;
+            background-color: #6e61a9;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- BottomSheet -->
+    <div class="BottomSheet" style="bottom: -500px;border-radius: 18px;" id="myBottomSheet">
+        <div class="operationBar">
+            <div class="icon-operationBar"></div>
+        </div>
+        <div class="BottomSheet-Body">
+            <div class="list">
+                <div class="item"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script>
+
+        function getData() {
+            var itemHtml = ""
+            for (var i = 0; i < 10; i++) {
+                itemHtml += `<div class="item"></div>`
+            }
+            $(".list").append($(itemHtml))
+        }
+        getData()
+        var isScollTop = true
+        $(".BottomSheet-Body").scroll(function () {
+            if ($(this).scrollTop() == 0) {
+                isScollTop = false
+                setTimeout(() => {
+                    isScollTop = true
+                }, 300)
+            } else {
+                isScollTop = false
+            }
+
+        })
+
+        var BottomSheet = $("#myBottomSheet")
+        var OperationBar = $("#")
+        var winHeigth = $(window).height()
+        var touchStartSize = ""
+        var BottomSheetStartTop = BottomSheet.offset().top
+        var touchStartTime = ""
+        BottomSheet.on('touchstart', function (even) {
+            //console.log("滑动开始")
+            if (!isScollTop) {
+                return
+            }
+            touchStartTime = new Date().getTime()
+            var touchSize = even.originalEvent.changedTouches[0].pageY
+            BottomSheetStartTop = BottomSheet.offset().top
+            touchStartSize = touchSize
+        })
+        BottomSheet.on('touchmove', function (even) {
+            //console.log("滑动进行")
+
+            var touchSize = even.originalEvent.changedTouches[0].pageY
+            var BottomSheetMoveSize = 0
+            var DTouchSize = touchStartSize - touchSize
+            //console.log(DTouchSize)
+
+            if (DTouchSize >= 0) {
+                if (BottomSheetStartTop != 0) {
+                    event.preventDefault();
+                }
+
+            } else {
+                if (!isScollTop) {
+                    event.preventDefault();
+                    return
+                }
+            }
+            BottomSheetMoveSize = BottomSheetStartTop - DTouchSize
+            if (BottomSheetMoveSize <= 0) {
+                BottomSheetMoveSize = 0
+            } else if (BottomSheetMoveSize >= 500) {
+                BottomSheetMoveSize = 500
+            }
+            BottomSheetMoveSize = 0 - BottomSheetMoveSize
+            BottomSheet.css({ "bottom": BottomSheetMoveSize + "px" })
+        })
+        BottomSheet.on('touchend', function (even) {
+            //console.log("滑动结束")
+            var touchSize = even.originalEvent.changedTouches[0].pageY
+            var BottomSheetMoveSize = 0
+            if (touchStartSize > touchSize) {
+                //上滑
+                BottomSheetMoveSize = 0
+            } else {
+                //下滑
+                BottomSheetMoveSize = -500
+            }
+            BottomSheet.animate({ "bottom": BottomSheetMoveSize + "px" }, 200);
+        })
+    </script>
+</body>
+
+
+
+</html>
